@@ -114,14 +114,20 @@ void print_choice_name(short x)
 
 }
 
-string victory_to_string(en_victory_sit x)
+string victory_to_string(en_victory_sit x) // add the back ground 
 {
-    if(x==en_victory_sit::person_win)
+    if(x==en_victory_sit::person_win){
+        system("color 2F");
         return "person";
-    else if(x==en_victory_sit::pc_win)
+    }
+    else if(x==en_victory_sit::pc_win){
+        system("color 4F");
        return "pc";
-    else if(x==en_victory_sit::no_winer)
+    }
+    else if(x==en_victory_sit::no_winer){
+        system("color 6F");    // Yellow background
         return "faire";
+    }
 
     return "unknown";
 
@@ -143,7 +149,7 @@ void round_result(int person ,int pc,int round_num,string x)
     cout<<"\t"<<"\t"<<"\t"<<"___________________________________________________________________"<<"\n"<<endl;
 }
 
-void rounds_result(short person ,short pc,short rounds,short draw)
+void final_result(short person ,short pc,short rounds,short draw)
 {
     cout<<"\t"<<"\t"<<"\t"<<"------------------------------------------------------------------"<<"\n";
     cout<<"\t"<<"\t"<<"\t"<<"\t"<<"\t"<<"\t"<<"[final result]"<<"\t"<<"\t"<<"\t"<<endl;
@@ -158,12 +164,19 @@ void rounds_result(short person ,short pc,short rounds,short draw)
     cout<<endl;
     cout<<"\t"<<"\t"<<"\t"<<"the draw time="<<draw<<endl;
     cout<<"\t"<<"\t"<<"\t"<<"final winner="; 
-        if(person>pc)
+        if(person>pc){
+                    system("color 2F");
             cout<<"person"<<endl;
-        else if(pc>person)
+        }
+        else if(pc>person){
+                    system("color 4F");
+
             cout<<"computer"<<endl;
-        else
+        }
+        else{
+            system("color 6F");    // Yellow background
             cout<<"draw"<<endl;
+        }
     cout<<"\t"<<"\t"<<"\t"<<"___________________________________________________________________"<<"\n"<<endl;
 }
 
@@ -179,7 +192,7 @@ void core_game()
     round_scores f;
     f.person=0 ,f.pc=0,f.draw=0 ;
 
-    en_victory_sit c;
+    en_victory_sit win;
      rounds=enter_num("enter the time of rounds =");
     do
     {
@@ -189,14 +202,14 @@ void core_game()
 
         pc_num=gen_random(1,3);
 
-        c=who_win(per_num,pc_num);
+        win=who_win(per_num,pc_num);
 
-        round_result(per_num ,pc_num,n,victory_to_string(c));
-        counter(c,f.person,f.pc,f.draw);
+        round_result(per_num ,pc_num,n,victory_to_string(win));
+        counter(win,f.person,f.pc,f.draw);
         
     }while(n<rounds);
 
-    rounds_result(f.person,f.pc,rounds,f.draw);
+    final_result(f.person,f.pc,rounds,f.draw);
 
     }while(enter_num("number you enter no=0,yes=anynumber =")!=0);
     
@@ -208,7 +221,10 @@ int main()
 
     core_game();
 
+    system("color 07");
     
+        return 0;
+
 
 }
 
@@ -219,4 +235,41 @@ int main()
     This is only a first step —
     I will improve it again, both before and after
     reviewing best practices.
+
+        finaly i'm very laizey in re enginearing the only game i only add the screan colores
+
+        i want to detarmine 
 */
+
+// -----------------------------------------------------------------
+// Truth table for who_win() / winner_by_lower_value() /
+// winner_by_upper_value()
+// -----------------------------------------------------------------
+// Enum values : paper=1 , stone=2 , scissor=3
+//
+// person | pc | gap=|person-pc| | rule applied      | winner
+// -------|----|-----------------|-------------------|----------
+//   1    | 1  |       0         | no_winer          | draw
+//   2    | 2  |       0         | no_winer          | draw
+//   3    | 3  |       0         | no_winer          | draw
+// -------|----|-----------------|-------------------|----------
+//   1    | 2  |       1         | lower value wins   | person (1)
+//   2    | 1  |       1         | lower value wins   | pc     (1)
+//   2    | 3  |       1         | lower value wins   | person (2)
+//   3    | 2  |       1         | lower value wins   | pc     (2)
+// -------|----|-----------------|-------------------|----------
+//   1    | 3  |       2         | upper value wins   | pc     (3)
+//   3    | 1  |       2         | upper value wins   | person (3)
+//
+// Summary of the rule:
+//   gap == 0  -> draw (no_winer)
+//   gap == 1  -> smaller number wins   (winner_by_lower_value)
+//   gap == 2  -> larger number wins    (winner_by_upper_value)
+//
+// Why the rule flips at gap==2:
+//   The three choices form a CYCLE (paper -> stone -> scissor -> paper),
+//   not a straight numeric order. Gap==2 only ever happens for the
+//   "wrap-around" pair (paper vs scissor), where the cycle folds back
+//   on itself, so the winner is the opposite of what gap==1 would
+//   predict.
+// -----------------------------------------------------------------
