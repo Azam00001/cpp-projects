@@ -1,25 +1,21 @@
 /*
-    system("color 3A"); // Black background, Light Green text
+    Stone-Paper-Scissor Game
 
-       -Write a small game program for Stone-Paper-Scissor
+    Requirements:
+    1. Ask the user how many rounds the game will have.
+    2. Each round: Player vs Computer.
+    3. Show the result after each round.
+    4. If the computer wins the round, ring a bell and show a red screen.
+    5. If the player wins the round, show a green screen.
+    6. After all rounds, show "Game Over" and print the final results,
+       then ask the user if they want to play again.
 
-       Requirements.
-
-» Ask for how many rounds the game will be.
-
-» Start each round Player vs Computer.
-
-* Show the results with each round.
-
-« If computer wins the round ring a bill , and screed red.
-+ If player won the round show green screen.
-
-» After all rounds show game over the print game results,
-    then ask the user if s/he want to play again?
-
+    system("color 3A"); // Black background, light green text
+    system("color 4F");    // Red background
+    system("color 2F");    // Green background
+    system("color 6F");    // Yellow background
 
 */
-
 #include <iostream>
 #include <cmath>
 #include <ctime>
@@ -28,7 +24,7 @@
 using namespace std;
 
 // first will using the enum to define the element of the game play 
-enum en_game {stone=1 ,paper=2,scissor=3};
+enum en_game {paper=1 ,stone=2,scissor=3};
 
 // define the players 
 enum players_type {person=1 ,pc=2};
@@ -37,7 +33,7 @@ enum players_type {person=1 ,pc=2};
 enum en_victory_sit {person_win=1 ,pc_win=2 ,no_winer=3};
 
 
-struct scores
+struct round_scores
 {
    short person;
     short pc;
@@ -65,7 +61,7 @@ int subtract(int a, int b) {
 }
 
 // to return the lowest number from two number
-en_victory_sit get_low(int person,int pc)
+en_victory_sit winner_by_lower_value(int person,int pc)
 {
     if(person <pc)
         return en_victory_sit::person_win;
@@ -74,7 +70,7 @@ en_victory_sit get_low(int person,int pc)
 }
 
 // define the upper number of two numbers
-en_victory_sit get_upper(int person,int pc)
+en_victory_sit winner_by_upper_value(int person,int pc)
 {
     if(person >pc)
         return en_victory_sit::person_win;
@@ -85,12 +81,12 @@ en_victory_sit get_upper(int person,int pc)
 // the target is returning the winner in the round 
  en_victory_sit who_win(int person ,int pc)
 {
-    short val=abs(subtract(person,pc));
+    short val=abs(person-pc);
 
     if(val==1)
-        return get_low(person,pc);
+        return winner_by_lower_value(person,pc);
     else if(val==2)
-        return get_upper(person,pc);
+        return winner_by_upper_value(person,pc);
     else
         return en_victory_sit::no_winer;
         
@@ -107,7 +103,7 @@ void counter(en_victory_sit x,short& person_wins,short& pc_wins,short& nowin)
 
 }
 
-void typer(short x)
+void print_choice_name(short x)
 {
     if(x==1)
         cout<<"paper"<<endl;
@@ -118,7 +114,7 @@ void typer(short x)
 
 }
 
-string typer2(en_victory_sit x)
+string victory_to_string(en_victory_sit x)
 {
     if(x==en_victory_sit::person_win)
         return "person";
@@ -138,10 +134,10 @@ void round_result(int person ,int pc,int round_num,string x)
     cout<<"\t"<<"\t"<<"\t"<<"\t"<<"\t"<<"\t"<<"the Round["<<round_num<<"]"<<"\t"<<"\t"<<"\t"<<endl;
     cout<<"\t"<<"\t"<<"\t"<<"------------------------------------------------------------------"<<"\n"<<"\n";
     cout<<"\t"<<"\t"<<"\t"<<"the person choise =";
-    typer(person);
+    print_choice_name(person);
     cout<<"\n";
     cout<<"\t"<<"\t"<<"\t"<<"the pc choise=";
-    typer(pc);
+    print_choice_name(pc);
     cout<<endl;
     cout<<"\t"<<"\t"<<"\t"<<"the winer="<<x<<endl;
     cout<<"\t"<<"\t"<<"\t"<<"___________________________________________________________________"<<"\n"<<endl;
@@ -180,7 +176,7 @@ void core_game()
         short rounds=0, n=0;
     short pc_num,per_num;
 
-    scores f;
+    round_scores f;
     f.person=0 ,f.pc=0,f.draw=0 ;
 
     en_victory_sit c;
@@ -189,13 +185,13 @@ void core_game()
     {
         ++n;
         
-        per_num=enter_num("enter the number of choise stone[1] , paper[2] ,scissor[3] =");
+        per_num=enter_num("enter the number of choise paper[1] , stone[2] ,scissor[3] =");
 
         pc_num=gen_random(1,3);
 
         c=who_win(per_num,pc_num);
 
-        round_result(per_num ,pc_num,n,typer2(c));
+        round_result(per_num ,pc_num,n,victory_to_string(c));
         counter(c,f.person,f.pc,f.draw);
         
     }while(n<rounds);
@@ -217,12 +213,10 @@ int main()
 }
 
 
-/**
-it's wery good and atchivement for me to finish the first project in my life withe out lock to the mentor selution 
-    it's only a first step 
-        i will inhance it again 
-            before and after locking to the round of best bractise
-
-
-
- */
+/*
+    It's a great achievement for me to finish my first project
+    without looking at the mentor's solution.
+    This is only a first step —
+    I will improve it again, both before and after
+    reviewing best practices.
+*/
